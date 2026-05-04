@@ -35,14 +35,6 @@ No hay que instalar nada.
     └── transformador.html
 ```
 
-## Física
-
-**Ferraris**: B̃ = BR+BS+BT → campo giratorio con |B̃| = (3/2)·B̂
-
-**Motor asíncrono**: modelo de Kloss. ns = 60f/p, s = (ns-nr)/ns
-
-**Transformador**: circuito de Kapp. ΔU = I₂(Rcc·cosφ + Xcc·sinφ), η = P₂/(P₂+P₀+β²·Pcc)
-
 ## Notas
 
-El código lo fui haciendo por partes así que hay alguna inconsistencia de estilo. Los modelos son simplificados (Kloss sin Thevenin completo, transformador sin rama de vacío en paralelo) pero son suficientes para visualización.
+El código lo fui haciendo por partes así que hay alguna inconsistencia de estilo. 
