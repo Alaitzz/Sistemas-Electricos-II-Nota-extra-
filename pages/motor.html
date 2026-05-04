@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Punto de Funcionamiento — Motor Asíncrono</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/comun.css" />
+  <style>
+    body{overflow-y:auto}
+    .layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 47px);gap:0}
+    .izq{padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--superficie);border-right:1px solid var(--borde);overflow-y:auto}
+    .der{padding:14px;display:flex;flex-direction:column;gap:14px}
+    .input-fila{display:flex;flex-direction:column;gap:3px}
+    .input-fila label{font-size:11px;color:var(--texto-dim);font-weight:600;display:flex;justify-content:space-between}
+    .input-num{width:100%;padding:5px 10px;background:var(--superficie2);border:1px solid var(--borde);color:var(--texto-claro);font-family:var(--fuente-mono);font-size:13px}
+    .input-num:focus{outline:none;border-color:#28e080}
+    select{width:100%;padding:5px 10px;background:var(--superficie2);border:1px solid var(--borde);color:var(--texto-claro);font-family:var(--fuente);font-size:12px;cursor:pointer}
+    select:focus{outline:none;border-color:#28e080}
+    .grid-res{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .res-card{background:var(--superficie);border:1px solid var(--borde);padding:10px;text-align:center;border-top:2px solid var(--cc,#28e080)}
+    .res-card .etiq{font-size:10px;color:var(--texto-dim);letter-spacing:1px;margin-bottom:3px}
+    .res-card .valor{font-family:var(--fuente-mono);font-size:18px;color:var(--cc,#28e080);font-weight:bold}
+    .res-card .uds{font-size:10px;color:var(--texto-dim);margin-top:2px}
+    .canvas-panel{background:var(--superficie);border:1px solid var(--borde);padding:10px}
+    .canvas-titulo{font-family:var(--fuente-mono);font-size:10px;color:#28e080;letter-spacing:2px;margin-bottom:8px}
+    #curvasCanvas,#curvas2Canvas{display:block;width:100%}
+    .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+    .bal-item{background:var(--superficie2);border:1px solid var(--borde);padding:7px 10px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
+    .bal-item span:first-child{color:var(--texto-dim)}
+    .bal-item span:last-child{font-family:var(--fuente-mono);color:var(--texto-claro)}
+  </style>
+</head>
+<body>
+  <nav class="nav-top">
+    <a href="../index.html" class="nav-logo">⚡ MÁQUINAS ELÉCTRICAS</a>
+    <div class="nav-links">
+      <a href="../index.html">Inicio</a>
+      <a href="ferraris.html">Ferraris</a>
+      <a href="campo.html">Campo B</a>
+      <a href="motor.html" class="activo">Motor</a>
+      <a href="transformador.html">Transformador</a>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <aside class="izq">
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#28e080">⚙ datos de red y placa</p>
+        <div class="control-grupo">
+          <div class="input-fila"><label>Tensión fase-fase V <span class="unidad">V</span></label><input type="number" class="input-num" id="m-vff" value="400" min="1"></div>
+          <div class="input-fila"><label>Frecuencia f <span class="unidad">Hz</span></label><input type="number" class="input-num" id="m-f" value="50" min="1"></div>
+          <div class="input-fila"><label>Polos totales p <span class="unidad">2,4,6...</span></label><input type="number" class="input-num" id="m-p" value="4" min="2" step="2"></div>
+          <div class="input-fila"><label>Potencia nominal Pn <span class="unidad">kW</span></label><input type="number" class="input-num" id="m-pn" value="7.5" min="0.1" step="0.1"></div>
+          <div class="input-fila"><label>Velocidad nominal nr <span class="unidad">rpm</span></label><input type="number" class="input-num" id="m-nr" value="1450" min="1"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#28e080">🔬 parámetros circuito equiv. (ref. estátor)</p>
+        <p style="font-size:10px;color:var(--texto-dim);margin-bottom:6px">Obtenidos de los ensayos (secc. 6 del temario)</p>
+        <div class="control-grupo">
+          <div class="input-fila"><label>R1 — resistencia estátor <span class="unidad">Ω</span></label><input type="number" class="input-num" id="m-r1" value="0.80" min="0" step="0.01"></div>
+          <div class="input-fila"><label>X1 — reactancia dispersión estátor <span class="unidad">Ω</span></label><input type="number" class="input-num" id="m-x1" value="1.20" min="0" step="0.01"></div>
+          <div class="input-fila"><label>R2 — resistencia rotor ref. estátor <span class="unidad">Ω</span></label><input type="number" class="input-num" id="m-r2" value="0.60" min="0" step="0.01"></div>
+          <div class="input-fila"><label>X2 — reactancia dispersión rotor <span class="unidad">Ω</span></label><input type="number" class="input-num" id="m-x2" value="1.40" min="0" step="0.01"></div>
+          <div class="input-fila"><label>gc — conductancia pérd. hierro <span class="unidad">S</span></label><input type="number" class="input-num" id="m-gc" value="0.002" min="0" step="0.0001"></div>
+          <div class="input-fila"><label>bm — susceptancia magnetizante <span class="unidad">S</span></label><input type="number" class="input-num" id="m-bm" value="0.015" min="0" step="0.0001"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#28e080">📦 carga mecánica</p>
+        <div class="control-grupo">
+          <div class="input-fila"><label>Tipo de carga</label>
+            <select id="m-tipocarga">
+              <option value="constante">Par constante</option>
+              <option value="cuadratico" selected>Par cuadrático (bomba/ventilador)</option>
+              <option value="lineal">Par lineal</option>
+            </select>
+          </div>
+          <div class="input-fila"><label>Par carga nominal <span class="unidad">N·m (0=de Pn)</span></label><input type="number" class="input-num" id="m-tcarga" value="0" min="0" step="0.1"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primario" id="m-calcular" style="border-color:#28e080;color:#28e080">▶ CALCULAR</button>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#28e080">📖 circuito de Thevenin</p>
+        <div class="teoria-box" style="border-left-color:#28e080;font-size:11px">
+          El equivalente de Thevenin entre A-B (ec. 16):
+          <span class="formula-inline" style="color:#28e080;font-size:12px">V1E = V1 / |1 + Ȳ·Z̄1|</span>
+          Par máximo (ec. 22):
+          <span class="formula-inline" style="color:#28e080;font-size:12px">T_max = 3V1E²/ωs · 1/(RE+√(RE²+(XE+X2)²))</span>
+          Balance (ec. 30): <em>Peh : Pcu2 : Pm = 1 : s : (1−s)</em>
+        </div>
+      </div>
+    </aside>
+
+    <div class="der">
+      <!-- tarjetas resultado principal -->
+      <div class="grid-res">
+        <div class="res-card" style="--cc:#28e080"><div class="etiq">VELOCIDAD TRABAJO</div><div class="valor" id="r-nr">—</div><div class="uds">rpm</div></div>
+        <div class="res-card" style="--cc:#f0c000"><div class="etiq">DESLIZAMIENTO</div><div class="valor" id="r-s">—</div><div class="uds">%</div></div>
+        <div class="res-card" style="--cc:#4090ff"><div class="etiq">PAR DESARROLLADO</div><div class="valor" id="r-t">—</div><div class="uds">N·m</div></div>
+        <div class="res-card" style="--cc:#f03050"><div class="etiq">CORRIENTE I1</div><div class="valor" id="r-i">—</div><div class="uds">A</div></div>
+        <div class="res-card" style="--cc:#28e080"><div class="etiq">POT. ABSORBIDA PE</div><div class="valor" id="r-p1">—</div><div class="uds">kW</div></div>
+        <div class="res-card" style="--cc:#f07030"><div class="etiq">RENDIMIENTO</div><div class="valor" id="r-eta">—</div><div class="uds">%</div></div>
+      </div>
+
+      <!-- balance de potencias y Thevenin -->
+      <div class="canvas-panel">
+        <p class="canvas-titulo">BALANCE DE POTENCIAS (ecs. 28-30) · PARÁMETROS THEVENIN</p>
+        <div class="balance-grid">
+          <div class="bal-item"><span>V1E (Thevenin)</span><span id="r-v1e">—</span></div>
+          <div class="bal-item"><span>T_max (ec. 22)</span><span id="r-tmax">—</span></div>
+          <div class="bal-item"><span>s_Tmax (ec. 21)</span><span id="r-stmax">—</span></div>
+          <div class="bal-item"><span>T_arranque (ec. 23)</span><span id="r-tarr">—</span></div>
+          <div class="bal-item"><span>I2_arranque (ec. 24)</span><span id="r-iarr">—</span></div>
+          <div class="bal-item"><span>cos(φ) trabajo</span><span id="r-cosphi">—</span></div>
+          <div class="bal-item"><span>Pérd. Cu rotor Pcu2</span><span id="r-pcu2">—</span></div>
+          <div class="bal-item"><span>Pot. entrehierro Peh</span><span id="r-peh">—</span></div>
+          <div class="bal-item"><span>Pot. mecánica Pm</span><span id="r-pm">—</span></div>
+        </div>
+      </div>
+
+      <!-- curva T(n) -->
+      <div class="canvas-panel">
+        <p class="canvas-titulo">CURVA PAR-VELOCIDAD T(n) · punto trabajo (rojo) · T_max (dorado)</p>
+        <canvas id="curvasCanvas" height="300"></canvas>
+      </div>
+
+      <!-- curva I y eta vs s -->
+      <div class="canvas-panel">
+        <p class="canvas-titulo">I₂(s) Y η(s) vs DESLIZAMIENTO · línea dorada = s_Tmax</p>
+        <canvas id="curvas2Canvas" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pie">circuito equivalente exacto con thevenin · ref: sistemas eléctricos ii - máquinas asíncronas</footer>
+  <script src="../js/motor.js"></script>
+</body>
+</html>
