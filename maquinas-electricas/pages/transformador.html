@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformador Monofásico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/comun.css" />
+  <style>
+    body{overflow-y:auto}
+    .layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 47px)}
+    .izq{padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--superficie);border-right:1px solid var(--borde);overflow-y:auto}
+    .der{padding:14px;display:flex;flex-direction:column;gap:14px}
+    .input-fila{display:flex;flex-direction:column;gap:3px}
+    .input-fila label{font-size:11px;color:var(--texto-dim);font-weight:600;display:flex;justify-content:space-between}
+    .input-num{width:100%;padding:5px 10px;background:var(--superficie2);border:1px solid var(--borde);color:var(--texto-claro);font-family:var(--fuente-mono);font-size:13px}
+    .input-num:focus{outline:none;border-color:#f0c000}
+    select{width:100%;padding:5px 10px;background:var(--superficie2);border:1px solid var(--borde);color:var(--texto-claro);font-family:var(--fuente);font-size:12px;cursor:pointer}
+    select:focus{outline:none;border-color:#f0c000}
+    .grid-res{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .res-card{background:var(--superficie);border:1px solid var(--borde);padding:10px;text-align:center;border-top:2px solid var(--cc,#f0c000)}
+    .res-card .etiq{font-size:10px;color:var(--texto-dim);letter-spacing:1px;margin-bottom:3px}
+    .res-card .valor{font-family:var(--fuente-mono);font-size:18px;color:var(--cc,#f0c000);font-weight:bold}
+    .res-card .uds{font-size:10px;color:var(--texto-dim);margin-top:2px}
+    .canvas-panel{background:var(--superficie);border:1px solid var(--borde);padding:10px}
+    .canvas-titulo{font-family:var(--fuente-mono);font-size:10px;color:#f0c000;letter-spacing:2px;margin-bottom:8px}
+    #circCanvas{display:block;width:100%}
+    #fasCanvas{display:block;margin:0 auto}
+    .bal-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+    .bal-item{background:var(--superficie2);border:1px solid var(--borde);padding:6px 10px;display:flex;justify-content:space-between;align-items:center;font-size:11px}
+    .bal-item span:first-child{color:var(--texto-dim)}
+    .bal-item span:last-child{font-family:var(--fuente-mono);color:var(--texto-claro);font-size:12px}
+  </style>
+</head>
+<body>
+  <nav class="nav-top">
+    <a href="../index.html" class="nav-logo">⚡ MÁQUINAS ELÉCTRICAS</a>
+    <div class="nav-links">
+      <a href="../index.html">Inicio</a>
+      <a href="ferraris.html">Ferraris</a>
+      <a href="campo.html">Campo B</a>
+      <a href="motor.html">Motor</a>
+      <a href="transformador.html" class="activo">Transformador</a>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <aside class="izq">
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#f0c000">🔁 valores nominales (placa)</p>
+        <div class="control-grupo">
+          <div class="input-fila"><label>Potencia nominal SN <span class="unidad">kVA</span></label><input type="number" class="input-num" id="t-sn" value="50" min="0.1" step="0.5"></div>
+          <div class="input-fila"><label>Tensión primaria V1N <span class="unidad">V</span></label><input type="number" class="input-num" id="t-v1n" value="20000" min="1"></div>
+          <div class="input-fila"><label>Tensión secundaria V2N <span class="unidad">V</span></label><input type="number" class="input-num" id="t-v2n" value="400" min="1"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#f0c000">⚡ ensayo de cortocircuito (Anexo A)</p>
+        <p style="font-size:10px;color:var(--texto-dim);margin-bottom:6px">Secundario en cc, se eleva V1 hasta I1=I1N</p>
+        <div class="control-grupo">
+          <div class="input-fila"><label>Tensión relativa cc εcc <span class="unidad">%  (ec. 24)</span></label><input type="number" class="input-num" id="t-ecc" value="4" min="0.1" max="20" step="0.1"></div>
+          <div class="input-fila"><label>Pérdidas cobre nominales PCuN <span class="unidad">W  (ec. 41)</span></label><input type="number" class="input-num" id="t-pcun" value="800" min="0"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#f0c000">🔬 ensayo de vacío (Anexo A)</p>
+        <p style="font-size:10px;color:var(--texto-dim);margin-bottom:6px">V1=V1N, secundario abierto</p>
+        <div class="control-grupo">
+          <div class="input-fila"><label>Potencia vacío P0 = PFe <span class="unidad">W  (ec. 13)</span></label><input type="number" class="input-num" id="t-p0" value="150" min="0"></div>
+          <div class="input-fila"><label>Corriente de vacío I0 <span class="unidad">% de I1N</span></label><input type="number" class="input-num" id="t-i0" value="2.5" min="0.1" step="0.1"></div>
+          <div class="input-fila"><label>Factor de potencia vacío cos(φ0)</label><input type="number" class="input-num" id="t-cphi0" value="0.1" min="0.01" max="1" step="0.01"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#f0c000">📦 condición de carga</p>
+        <div class="control-grupo">
+          <div class="input-fila">
+            <label>Índice de carga C = S/SN <span class="unidad">(ec. 37)</span></label>
+            <div class="slider-fila"><input type="range" id="t-C" min="0" max="1.25" value="1" step="0.05"><span class="valor-display" id="tv-C">1.00</span></div>
+          </div>
+          <div class="input-fila">
+            <label>Factor de potencia cos(φ2)</label>
+            <div class="slider-fila"><input type="range" id="t-cphi2" min="0.1" max="1" value="0.85" step="0.01"><span class="valor-display" id="tv-cphi2">0.85</span></div>
+          </div>
+          <div class="input-fila"><label>Tipo de carga</label>
+            <select id="t-tipo">
+              <option value="ind">Inductiva (retraso) — signo +</option>
+              <option value="res">Resistiva</option>
+              <option value="cap">Capacitiva (adelanto) — signo − / Ferranti</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primario" id="t-calcular" style="border-color:#f0c000;color:#f0c000">▶ CALCULAR</button>
+
+      <div class="panel">
+        <p class="panel-titulo" style="color:#f0c000">📖 circuito equiv. aproximado</p>
+        <div class="teoria-box" style="border-left-color:#f0c000;font-size:11px">
+          Caída de tensión (ec. 36):
+          <span class="formula-inline" style="color:#f0c000;font-size:12px">εc = C·(εRcc·cosφ ± εXcc·sinφ)</span>
+          Rendimiento (ec. 48):
+          <span class="formula-inline" style="color:#f0c000;font-size:12px">η = C·SN·cosφ / (C·SN·cosφ + C²·PCuN + P0)</span>
+          Índice óptimo (ec. 51): <em>Copt = √(PFe/PCuN)</em>
+        </div>
+      </div>
+    </aside>
+
+    <div class="der">
+      <div class="grid-res">
+        <div class="res-card" style="--cc:#f0c000"><div class="etiq">TENSIÓN SECUNDARIA V2</div><div class="valor" id="r-u2">—</div><div class="uds">V</div></div>
+        <div class="res-card" style="--cc:#f07030"><div class="etiq">CAÍDA TENSIÓN εc (ec. 36)</div><div class="valor" id="r-du">—</div><div class="uds">%</div></div>
+        <div class="res-card" style="--cc:#28e080"><div class="etiq">RENDIMIENTO η (ec. 48)</div><div class="valor" id="r-eta">—</div><div class="uds">%</div></div>
+        <div class="res-card" style="--cc:#4090ff"><div class="etiq">CORRIENTE I2</div><div class="valor" id="r-i2">—</div><div class="uds">A</div></div>
+        <div class="res-card" style="--cc:#f03050"><div class="etiq">CORRIENTE I1 (aprox.)</div><div class="valor" id="r-i1">—</div><div class="uds">A</div></div>
+        <div class="res-card" style="--cc:#28e080"><div class="etiq">POTENCIA ENTREGADA P2</div><div class="valor" id="r-p2">—</div><div class="uds">kW</div></div>
+      </div>
+
+      <div class="canvas-panel">
+        <p class="canvas-titulo">PARÁMETROS CIRCUITO EQUIVALENTE APROXIMADO (Fig. 14)</p>
+        <div class="bal-grid" id="circ-params">
+          <div class="bal-item"><span>—</span><span>Pulsa calcular</span></div>
+        </div>
+      </div>
+
+      <div class="canvas-panel">
+        <p class="canvas-titulo">CURVA η vs ÍNDICE DE CARGA C (Fig. 20) · Copt marcado</p>
+        <canvas id="circCanvas" height="220"></canvas>
+      </div>
+
+      <div class="canvas-panel" style="display:flex;flex-direction:column;align-items:center">
+        <p class="canvas-titulo" style="align-self:flex-start">DIAGRAMA FASORIAL — circuito equiv. aproximado (Anexo B)</p>
+        <canvas id="fasCanvas" width="440" height="280"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pie">circuito equivalente aproximado · ref: transformadores - m.a. rodríguez pozueta, univ. cantabria</footer>
+  <script src="../js/transformador.js"></script>
+</body>
+</html>
