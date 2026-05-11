@@ -1,6 +1,6 @@
 # Simuladores de Máquinas Eléctricas
 
-Proyecto web con simuladores interactivos para la asignatura de Máquinas Eléctricas. Todo está hecho con HTML, CSS y JavaScript puro, sin librerías externas.
+Proyecto web con simuladores interactivos para la asignatura de Sistemas Eléctricos II. Todo está hecho con HTML, CSS y JavaScript puro, sin librerías externas.
 
 ## Qué hay
 
